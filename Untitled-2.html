@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>参保证明防伪</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #F5F5F5;
+        }
+        /* 第一个页面的样式 */
+        .container {
+            text-align: center;
+        }
+        #page1 img {
+            display: block;
+            margin: 0 auto;
+        }
+        #page1 p {
+            color: orange;
+            text-align: center;
+            font-size: 18px;
+        }
+        .return-button {
+            background-color: #007BFF; /* 蓝色 */
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            text-align: center;
+            text-decoration: none;
+            font-size: 16px;
+            margin: 4px 2px;
+            cursor: pointer;
+            border-radius: 5px;
+            width: 80%;
+        }
+        /* 第二个页面的样式 */
+        .tip-box {
+            background-color: #FFF8DC; /* 白杏色 */
+            border-top: 2px solid orange;
+            border-bottom: 2px solid orange;
+            padding: 20px;
+            margin: 20px;
+        }
+        .tip-box h1 {
+            font-size: 21px;
+            margin: 0;
+            color: black;
+            font-weight: normal;
+        }
+        .tip-box p {
+            margin-top: 10px;
+            line-height: 1.5;
+            color: gray;
+            font-size: 16px;
+        }
+        .verification-box {
+            background-color: #FFFFFF;
+            padding: 20px;
+            margin: 20px;
+        }
+        .verification-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .verification-row label {
+            font-size: 16px;
+        }
+        .verification-row label .required {
+            color: red;
+        }
+        .verification-row input {
+            background-color: #FFFFFF;
+            border: none;
+            padding: 5px;
+            font-size: 16px;
+            width: 200px;
+        }
+        .verification-row input:focus {
+            outline: none;
+            border: 1px solid #FFFFFF;
+        }
+        .query-button {
+            display: block;
+            margin: 20px auto;
+            background-color: #007BFF;
+            color: #FFFFFF;
+            font-size: 18px;
+            padding: 12px 0;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            width: 33.33%;
+            text-align: center;
+        }
+        .query-button:hover {
+            background-color: #0056b3;
+        }
+        /* 弹窗样式 */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.4);
+            align-items: center;
+            justify-content: center;
+        }
+        .modal-content {
+            background-color: #FFFFFF;
+            padding: 20px;
+            border: 1px solid #888;
+            width: 300px;
+            text-align: center;
+            border-radius: 10px;
+        }
+        .modal-header {
+            font-size: 21px;
+            color: black;
+            margin-bottom: 20px;
+        }
+        .modal-message {
+            font-size: 16px;
+            color: gray;
+            margin-bottom: 20px;
+        }
+        .modal-separator {
+            border-top: 1px solid #DDD;
+            margin: 20px 0;
+        }
+        .modal-button {
+            width: 100%;
+            background-color: transparent;
+            border: none;
+            color: #007BFF;
+            font-size: 21px;
+            cursor: pointer;
+        }
+        .modal-button:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- 第一个页面 -->
+    <div id="page1">
+        <div class="container">
+            <img id="proof-img" src="cbzm.png" alt="参保证明防伪图片">
+            <p>长按图片可进行保存!!!</p>
+        </div>
+        <div style="text-align: center;">
+            <button class="return-button" id="return-button">返回</button>
+        </div>
+    </div>
+
+    <!-- 第二个页面 -->
+    <div id="page2" style="display: none;">
+        <div class="tip-box">
+            <h1>小贴士</h1>
+            <p>防伪认证功能为吉林省社会保险事业管理局通过自助机及网上经办系统出具的参保证明提供防伪查询服务，输入单据上的防伪码即可查询单据信息。</p>
+        </div>
+        <div class="verification-box">
+            <div class="verification-row">
+                <label><span class="required">*</span>防伪码</label>
+                <input type="text" id="codeInput" placeholder="">
+            </div>
+        </div>
+        <button class="query-button" onclick="validateCode()">查询</button>
+
+        <!-- 弹窗 -->
+        <div id="errorModal" class="modal">
+            <div class="modal-content">
+                <div class="modal-header">提示</div>
+                <div class="modal-message">系统错误，请联系管理员</div>
+                <div class="modal-separator"></div>
+                <button class="modal-button" onclick="closeModal()">确定</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // 页面切换逻辑
+            var page1 = document.getElementById('page1');
+            var page2 = document.getElementById('page2');
+            var returnButton = document.getElementById('return-button');
+
+            returnButton.addEventListener('click', function() {
+                // 隐藏第一个页面，显示第二个页面
+                page1.style.display = 'none';
+                page2.style.display = 'block';
+            });
+
+            // 验证防伪码函数
+            function validateCode() {
+                var inputCode = document.getElementById('codeInput').value;
+                if (inputCode !== '4675d6cad7') {
+                    // 显示弹窗
+                    var modal = document.getElementById('errorModal');
+                    modal.style.display = 'flex';
+                } else {
+                    // 防伪码正确，返回第一个页面
+                    page2.style.display = 'none';
+                    page1.style.display = 'block';
+                }
+            }
+
+            function closeModal() {
+                document.getElementById('errorModal').style.display = 'none';
+            }
+
+            // 使函数在全局范围内可访问
+            window.validateCode = validateCode;
+            window.closeModal = closeModal;
+
+            // 图片长按保存功能
+            var img = document.getElementById('proof-img');
+            img.addEventListener('longpress', function () {
+                // 创建一个隐藏的a标签
+                var a = document.createElement('a');
+                a.href = img.src;
+                a.download = 'cbzm.png';
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+            });
+            img.addEventListener('mousedown', function (e) {
+                if (e.which === 1) {
+                    var timeout;
+                    timeout = setTimeout(function () {
+                        img.dispatchEvent(new CustomEvent('longpress'));
+                    }, 1000);
+                    img.addEventListener('mouseup', function () {
+                        clearTimeout(timeout);
+                    });
+                }
+            });
+        });
+    </script>
+</body>
+</html>
